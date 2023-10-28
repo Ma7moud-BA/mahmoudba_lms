@@ -6,6 +6,7 @@ import { LucideLayoutDashboard } from "lucide-react";
 import { IconBadge } from "@/components/icon-badge";
 import TitleForm from "./_components/TitleForm";
 import DescriptionForm from "./_components/DescriptionForm";
+import ImageForm from "./_components/image-form";
 type Props = {
 	params: { courseId: string };
 };
@@ -48,6 +49,7 @@ const CoursePage = async ({ params }: Props) => {
 					</div>
 					<TitleForm initialData={course} />
 					<DescriptionForm initialData={course} />
+					<ImageForm initialData={course} />
 				</div>
 			</div>
 		</div>
