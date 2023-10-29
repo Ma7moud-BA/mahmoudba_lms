@@ -21,13 +21,15 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Course } from "@prisma/client";
+import { Combobox } from "@/components/ui/combobox";
 type Props = {
 	initialData: Course;
+	options: { label: string; value: string }[];
 };
 const formSchema = z.object({
-	description: z.string(),
+	categoryId: z.string().min(1),
 });
-const DescriptionForm = ({ initialData }: Props) => {
+const CategoriesForm = ({ initialData, options }: Props) => {
 	const [isEditing, setIsEditing] = useState<Boolean>(false);
 	const toggleEdit = () => {
 		setIsEditing((prev) => !prev);
@@ -36,7 +38,7 @@ const DescriptionForm = ({ initialData }: Props) => {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			description: initialData.description || "", // Convert null to an empty string
+			categoryId: initialData.categoryId || "", // Convert null to an empty string
 		},
 	});
 
@@ -51,18 +53,20 @@ const DescriptionForm = ({ initialData }: Props) => {
 			toast.error("Something went wrong");
 		}
 	};
-
+	const selectedOption = options.find(
+		(option) => option.value === initialData.categoryId
+	);
 	return (
 		<div className="mt-6 border bg-slate-100 rounded-md p-4">
 			<div className="font-medium flex items-center justify-between">
-				Course description
+				Course Category
 				<Button variant={"ghost"} onClick={toggleEdit}>
 					{isEditing ? (
 						<>cancel</>
 					) : (
 						<>
 							<BiPencil className="h-4 w-4 mr-2" />
-							Edit title
+							Edit Category
 						</>
 					)}
 				</Button>
@@ -76,15 +80,11 @@ const DescriptionForm = ({ initialData }: Props) => {
 					>
 						<FormField
 							control={form.control}
-							name="description"
+							name="categoryId"
 							render={({ field }) => (
 								<FormItem>
 									<FormControl>
-										<Textarea
-											disabled={isSubmitting}
-											placeholder="e.g. 'This course is about....'"
-											{...field}
-										/>
+										<Combobox options={options} {...field} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -99,14 +99,14 @@ const DescriptionForm = ({ initialData }: Props) => {
 				<p
 					className={cn(
 						"text-sm ml-2",
-						!initialData.description && "text-slate-700 italic"
+						!initialData.categoryId && "text-slate-700 italic"
 					)}
 				>
-					{initialData.description || "No description"}
+					{selectedOption?.label || "No category"}
 				</p>
 			)}
 		</div>
 	);
 };
 
-export default DescriptionForm;
+export default CategoriesForm;

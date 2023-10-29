@@ -7,6 +7,10 @@ import { IconBadge } from "@/components/icon-badge";
 import TitleForm from "./_components/TitleForm";
 import DescriptionForm from "./_components/DescriptionForm";
 import ImageForm from "./_components/image-form";
+import CategoriesForm from "./_components/categories-form";
+import { BsListCheck } from "react-icons/bs";
+import { AiOutlineDollar } from "react-icons/ai";
+import PriceForm from "./_components/price-form";
 type Props = {
 	params: { courseId: string };
 };
@@ -17,6 +21,7 @@ const CoursePage = async ({ params }: Props) => {
 		return redirect("/");
 	}
 	const course = await db.course.findUnique({ where: { id: courseId } });
+	const categories = await db.category.findMany({ orderBy: { name: "asc" } });
 	if (!course) {
 		return redirect("/");
 	}
@@ -50,6 +55,30 @@ const CoursePage = async ({ params }: Props) => {
 					<TitleForm initialData={course} />
 					<DescriptionForm initialData={course} />
 					<ImageForm initialData={course} />
+					<CategoriesForm
+						initialData={course}
+						options={categories.map((category) => ({
+							label: category.name,
+							value: category.id,
+						}))}
+					/>
+				</div>
+				<div className="space-y-6">
+					<div>
+						<div className="flex items-center gap-x-2">
+							<IconBadge icon={BsListCheck} />
+
+							<h2> Course chapters</h2>
+						</div>
+						<div>TODO:CHAPTERS</div>
+					</div>
+					<div>
+						<div className="flex items-center gap-x-2">
+							<IconBadge icon={AiOutlineDollar} />
+							<h2 className="text-xl">Sell your course</h2>
+						</div>
+						<PriceForm initialData={course} />
+					</div>
 				</div>
 			</div>
 		</div>

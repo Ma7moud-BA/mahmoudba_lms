@@ -21,13 +21,14 @@ import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Course } from "@prisma/client";
+import { formatPrice } from "@/lib/format-price";
 type Props = {
 	initialData: Course;
 };
 const formSchema = z.object({
-	description: z.string(),
+	price: z.coerce.number(),
 });
-const DescriptionForm = ({ initialData }: Props) => {
+const PriceForm = ({ initialData }: Props) => {
 	const [isEditing, setIsEditing] = useState<Boolean>(false);
 	const toggleEdit = () => {
 		setIsEditing((prev) => !prev);
@@ -36,7 +37,7 @@ const DescriptionForm = ({ initialData }: Props) => {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			description: initialData.description || "", // Convert null to an empty string
+			price: initialData.price || undefined, // Convert null to an empty string
 		},
 	});
 
@@ -55,14 +56,14 @@ const DescriptionForm = ({ initialData }: Props) => {
 	return (
 		<div className="mt-6 border bg-slate-100 rounded-md p-4">
 			<div className="font-medium flex items-center justify-between">
-				Course description
+				Course price
 				<Button variant={"ghost"} onClick={toggleEdit}>
 					{isEditing ? (
 						<>cancel</>
 					) : (
 						<>
 							<BiPencil className="h-4 w-4 mr-2" />
-							Edit title
+							Edit price
 						</>
 					)}
 				</Button>
@@ -76,15 +77,17 @@ const DescriptionForm = ({ initialData }: Props) => {
 					>
 						<FormField
 							control={form.control}
-							name="description"
+							name="price"
 							render={({ field }) => (
 								<FormItem>
 									<FormControl>
-										<Textarea
+										<Input
+											type="number"
+											step={1.0}
 											disabled={isSubmitting}
-											placeholder="e.g. 'This course is about....'"
+											placeholder="Set a price for your course"
 											{...field}
-										/>
+										></Input>
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -99,14 +102,16 @@ const DescriptionForm = ({ initialData }: Props) => {
 				<p
 					className={cn(
 						"text-sm ml-2",
-						!initialData.description && "text-slate-700 italic"
+						!initialData.price && "text-slate-700 italic"
 					)}
 				>
-					{initialData.description || "No description"}
+					{initialData.price
+						? formatPrice(initialData.price)
+						: "No price is set"}
 				</p>
 			)}
 		</div>
 	);
 };
 
-export default DescriptionForm;
+export default PriceForm;

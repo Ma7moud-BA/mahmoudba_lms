@@ -51,7 +51,7 @@ export const IconBadge = ({ icon: Icon, variant, size }: IconBadgeProps) => {
 			<div
 				className={cn(
 					iconVariants({ variant, size }),
-					"flex justify-center items-center"
+					"flex justify-center items-center text-2xl"
 				)}
 			>
 				<Icon />
