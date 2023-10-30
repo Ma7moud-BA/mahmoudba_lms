@@ -12,6 +12,7 @@ import { BsListCheck } from "react-icons/bs";
 import { AiFillFile, AiOutlineDollar } from "react-icons/ai";
 import PriceForm from "./_components/price-form";
 import AttachmentForm from "./_components/attachement-form";
+import ChaptersForm from "./_components/chapters-form";
 type Props = {
 	params: { courseId: string };
 };
@@ -22,8 +23,11 @@ const CoursePage = async ({ params }: Props) => {
 		return redirect("/");
 	}
 	const course = await db.course.findUnique({
-		where: { id: courseId },
-		include: { attachments: { orderBy: { createdAt: "desc" } } },
+		where: { id: courseId, userId },
+		include: {
+			attachments: { orderBy: { createdAt: "desc" } },
+			chapters: { orderBy: { position: "asc" } },
+		},
 	});
 	const categories = await db.category.findMany({ orderBy: { name: "asc" } });
 	if (!course) {
@@ -35,6 +39,7 @@ const CoursePage = async ({ params }: Props) => {
 		course.imageUrl,
 		course.price,
 		course.categoryId,
+		course.chapters.some((chapter) => chapter.isPublished),
 	];
 	const totalFields = requiredFields.length;
 	//this will get all the fields that does'nt equal to false
@@ -74,7 +79,7 @@ const CoursePage = async ({ params }: Props) => {
 
 							<h2> Course chapters</h2>
 						</div>
-						<div>TODO:CHAPTERS</div>
+						<ChaptersForm initialData={course} />
 					</div>
 					<div>
 						<div className="flex items-center gap-x-2">
