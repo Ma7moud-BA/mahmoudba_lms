@@ -20,14 +20,22 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
-import { Course } from "@prisma/client";
+import { Chapter, Course } from "@prisma/client";
+import { Editor } from "@/components/editor";
+import { Preview } from "@/components/preview";
 type Props = {
-	initialData: Course;
+	initialData: Chapter;
+	chapterId: string;
+	courseId: string;
 };
 const formSchema = z.object({
 	description: z.string(),
 });
-const DescriptionForm = ({ initialData }: Props) => {
+const ChapterDescriptionForm = ({
+	initialData,
+	chapterId,
+	courseId,
+}: Props) => {
 	const [isEditing, setIsEditing] = useState<Boolean>(false);
 	const toggleEdit = () => {
 		setIsEditing((prev) => !prev);
@@ -43,8 +51,11 @@ const DescriptionForm = ({ initialData }: Props) => {
 	const { isSubmitting, isValid } = form.formState;
 	const onSubmit = async (values: z.infer<typeof formSchema>) => {
 		try {
-			await axios.patch(`/api/courses/${initialData.id}`, values);
-			toast.success("Course title Updated");
+			await axios.patch(
+				`/api/courses/${courseId}/chapters/${chapterId}`,
+				values
+			);
+			toast.success("Chapter Updated");
 			toggleEdit();
 			router.refresh();
 		} catch (error) {
@@ -55,7 +66,7 @@ const DescriptionForm = ({ initialData }: Props) => {
 	return (
 		<div className="mt-6 border bg-slate-100 rounded-md p-4">
 			<div className="font-medium flex items-center justify-between">
-				Course description
+				Chapter description
 				<Button variant={"ghost"} onClick={toggleEdit}>
 					{isEditing ? (
 						<>cancel</>
@@ -80,11 +91,7 @@ const DescriptionForm = ({ initialData }: Props) => {
 							render={({ field }) => (
 								<FormItem>
 									<FormControl>
-										<Textarea
-											disabled={isSubmitting}
-											placeholder="e.g. 'This course is about....'"
-											{...field}
-										/>
+										<Editor {...field} />
 									</FormControl>
 									<FormMessage />
 								</FormItem>
@@ -96,17 +103,21 @@ const DescriptionForm = ({ initialData }: Props) => {
 					</form>
 				</Form>
 			) : (
-				<p
+				<div
 					className={cn(
 						"text-sm ml-2",
 						!initialData.description && "text-slate-700 italic"
 					)}
 				>
-					{initialData.description || "No description"}
-				</p>
+					{initialData.description ? (
+						<Preview value={initialData.description} />
+					) : (
+						"No description"
+					)}
+				</div>
 			)}
 		</div>
 	);
 };
 
-export default DescriptionForm;
+export default ChapterDescriptionForm;

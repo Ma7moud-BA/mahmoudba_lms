@@ -79,3 +79,7 @@ body,
 		@apply bg-background text-foreground;
 	}
 }
+/* for the Preview component content */
+.ql-container {
+	font-size: 1rem !important;
+}

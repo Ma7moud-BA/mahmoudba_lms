@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { LucideLayoutDashboard } from "lucide-react";
 import { IconBadge } from "@/components/icon-badge";
 import TitleForm from "./_components/TitleForm";
-import DescriptionForm from "./_components/DescriptionForm";
+import DescriptionForm from "./_components/description-form";
 import ImageForm from "./_components/image-form";
 import CategoriesForm from "./_components/categories-form";
 import { BsListCheck } from "react-icons/bs";
