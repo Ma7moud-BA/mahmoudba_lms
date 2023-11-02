@@ -3,11 +3,18 @@ import { db } from "@/lib/db";
 import { auth } from "@clerk/nextjs";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AiFillBackward } from "react-icons/ai";
+import {
+	AiFillBackward,
+	AiOutlineEye,
+	AiOutlineVideoCamera,
+	AiOutlineVideoCameraAdd,
+} from "react-icons/ai";
 import { BiArrowBack } from "react-icons/bi";
 import { LuLayoutDashboard } from "react-icons/lu";
 import ChapterTitleForm from "./_components/Chapter-title-form";
 import ChapterDescriptionForm from "./_components/chapter-description-form";
+import ChapterAccessForm from "./_components/chapter-access-form";
+import ChapterVideoForm from "./_components/chapter-video-form";
 const ChapterIdPage = async ({
 	params,
 }: {
@@ -71,6 +78,28 @@ const ChapterIdPage = async ({
 							courseId={courseId}
 						/>
 					</div>
+					<div>
+						<div className="flex items-center gap-x-2">
+							<IconBadge icon={AiOutlineEye} />
+							<h2 className="text-xl"> Access Settings</h2>
+						</div>
+						<ChapterAccessForm
+							initialData={chapter}
+							chapterId={chapterId}
+							courseId={courseId}
+						/>
+					</div>
+				</div>
+				<div>
+					<div className="flex items-center gap-x-2">
+						<IconBadge icon={AiOutlineVideoCamera} />
+						<h2 className="text-xl">Add a video</h2>
+					</div>
+					<ChapterVideoForm
+						initialData={chapter}
+						chapterId={chapterId}
+						courseId={courseId}
+					/>
 				</div>
 			</div>
 		</div>

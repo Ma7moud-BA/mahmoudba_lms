@@ -23,19 +23,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Chapter, Course } from "@prisma/client";
 import { Editor } from "@/components/editor";
 import { Preview } from "@/components/preview";
+import { Checkbox } from "@/components/ui/checkbox";
 type Props = {
 	initialData: Chapter;
 	chapterId: string;
 	courseId: string;
 };
 const formSchema = z.object({
-	description: z.string().min(1),
+	isFree: z.boolean().default(false),
 });
-const ChapterDescriptionForm = ({
-	initialData,
-	chapterId,
-	courseId,
-}: Props) => {
+const ChapterAccessForm = ({ initialData, chapterId, courseId }: Props) => {
 	const [isEditing, setIsEditing] = useState<Boolean>(false);
 	const toggleEdit = () => {
 		setIsEditing((prev) => !prev);
@@ -44,7 +41,7 @@ const ChapterDescriptionForm = ({
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			description: initialData.description || "", // Convert null to an empty string
+			isFree: Boolean(initialData.isFree), // make sure its a boolean value if its undefined
 		},
 	});
 
@@ -66,14 +63,14 @@ const ChapterDescriptionForm = ({
 	return (
 		<div className="mt-6 border bg-slate-100 rounded-md p-4">
 			<div className="font-medium flex items-center justify-between">
-				Chapter description
+				Chapter Access
 				<Button variant={"ghost"} onClick={toggleEdit}>
 					{isEditing ? (
 						<>cancel</>
 					) : (
 						<>
 							<BiPencil className="h-4 w-4 mr-2" />
-							Edit title
+							Edit access
 						</>
 					)}
 				</Button>
@@ -87,12 +84,20 @@ const ChapterDescriptionForm = ({
 					>
 						<FormField
 							control={form.control}
-							name="description"
+							name="isFree"
 							render={({ field }) => (
-								<FormItem>
+								<FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
 									<FormControl>
-										<Editor {...field} />
+										<Checkbox
+											checked={field.value}
+											onCheckedChange={field.onChange}
+										/>
 									</FormControl>
+									<div className="space-y-1 leading-none">
+										<FormDescription>
+											Check this field to make this chapter free for preview
+										</FormDescription>
+									</div>
 									<FormMessage />
 								</FormItem>
 							)}
@@ -106,13 +111,13 @@ const ChapterDescriptionForm = ({
 				<div
 					className={cn(
 						"text-sm ml-2",
-						!initialData.description && "text-slate-700 italic"
+						!initialData.isFree && "text-slate-700 italic"
 					)}
 				>
-					{initialData.description ? (
-						<Preview value={initialData.description} />
+					{initialData.isFree ? (
+						<p>Free For Preview</p>
 					) : (
-						"No description"
+						<p>Not Free For Preview</p>
 					)}
 				</div>
 			)}
@@ -120,4 +125,4 @@ const ChapterDescriptionForm = ({
 	);
 };
 
-export default ChapterDescriptionForm;
+export default ChapterAccessForm;
