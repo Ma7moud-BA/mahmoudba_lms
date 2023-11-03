@@ -59,7 +59,67 @@ export async function PATCH(
 		}
 		return NextResponse.json(chapter);
 	} catch (error) {
-		console.log("[COURSES_CHAPTER_ID]", error);
+		console.log("[COURSES_CHAPTER_ID_PATCH]", error);
+		return new NextResponse("Internal Error", { status: 500 });
+	}
+}
+
+export async function DELETE(
+	req: Request,
+	{ params }: { params: { courseId: string; chapterId: string } }
+) {
+	try {
+		const { courseId, chapterId } = params;
+		const { userId } = auth();
+		//isPublished is going to be handled is a separate route after check all the requirements fields for the chapter to be published
+		if (!userId) {
+			return new NextResponse("Unauthorized", { status: 401 });
+		}
+		const courseOwner = await db.course.findUnique({
+			where: { id: courseId, userId: userId },
+		});
+		if (!courseOwner) {
+			return new NextResponse("Unauthorized", { status: 401 });
+		}
+		const chapter = await db.chapter.findUnique({
+			where: { id: chapterId, courseId: courseId },
+		});
+		if (!chapter) {
+			return new NextResponse("Not Found", { status: 404 });
+		}
+		if (chapter.videoUrl) {
+			const existingMuxData = await db.muxData.findFirst({
+				where: {
+					chapterId: chapterId,
+				},
+			});
+			if (existingMuxData) {
+				await Video.Assets.del(existingMuxData.assetId);
+				await db.muxData.delete({
+					where: { id: existingMuxData.id },
+				});
+			}
+		}
+		const deletedChapter = await db.chapter.delete({
+			where: { id: chapterId },
+		});
+		// in case this is the only chapter remaining published in the course and we deleted it unpublish the entire course
+		const publishedChaptersInCourse = await db.chapter.findMany({
+			where: { courseId: courseId, isPublished: true },
+		});
+		if (!publishedChaptersInCourse) {
+			await db.course.update({
+				where: {
+					id: courseId,
+				},
+				data: {
+					isPublished: false,
+				},
+			});
+		}
+		return NextResponse.json(deletedChapter);
+	} catch (error) {
+		console.log("[COURSES_CHAPTER_ID_DELETE]", error);
 		return new NextResponse("Internal Error", { status: 500 });
 	}
 }
