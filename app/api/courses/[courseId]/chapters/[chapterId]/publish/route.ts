@@ -6,7 +6,6 @@ export async function PATCH(
 	req: Request,
 	{ params }: { params: { courseId: string; chapterId: string } }
 ) {
-	console.log("here1");
 	try {
 		const { courseId, chapterId } = params;
 		const { userId } = auth();
@@ -21,7 +20,23 @@ export async function PATCH(
 			return new NextResponse("Unauthorized", { status: 401 });
 		}
 
-		const unPublishedChapter = await db.chapter.update({
+		const chapter = await db.chapter.findUnique({
+			where: { id: chapterId, courseId: courseId },
+		});
+		const muxData = await db.muxData.findUnique({
+			where: { chapterId: chapterId },
+		});
+
+		if (
+			!chapter ||
+			!muxData ||
+			!chapter.title ||
+			!chapter.description ||
+			!chapter.videoUrl
+		) {
+			return new NextResponse("Missing required fields", { status: 400 });
+		}
+		const publishedChapter = await db.chapter.update({
 			where: {
 				courseId: courseId,
 				id: chapterId,
@@ -30,7 +45,7 @@ export async function PATCH(
 				isPublished: true,
 			},
 		});
-		return NextResponse.json(unPublishedChapter);
+		return NextResponse.json(publishedChapter);
 	} catch (error) {
 		console.log("[CHAPTER_PUBLISH]", error);
 		return new NextResponse("Internal Error", { status: 500 });

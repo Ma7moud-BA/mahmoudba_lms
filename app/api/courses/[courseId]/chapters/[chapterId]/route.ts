@@ -100,14 +100,16 @@ export async function DELETE(
 				});
 			}
 		}
+
 		const deletedChapter = await db.chapter.delete({
 			where: { id: chapterId },
 		});
+		console.log(deletedChapter);
 		// in case this is the only chapter remaining published in the course and we deleted it unpublish the entire course
 		const publishedChaptersInCourse = await db.chapter.findMany({
 			where: { courseId: courseId, isPublished: true },
 		});
-		if (!publishedChaptersInCourse) {
+		if (!publishedChaptersInCourse.length) {
 			await db.course.update({
 				where: {
 					id: courseId,

@@ -45,7 +45,7 @@ const ChapterIdPage = async ({
 	return (
 		<>
 			{!chapter.isPublished && (
-				<Alert className="bg-yellow-200">
+				<Alert className="bg-yellow-200 rounded-none">
 					<FiAlertTriangle className="h-4 w-4" />
 
 					<AlertDescription>

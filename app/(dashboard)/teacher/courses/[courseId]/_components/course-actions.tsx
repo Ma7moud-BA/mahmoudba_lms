@@ -11,15 +11,9 @@ import { BsTrash } from "react-icons/bs";
 type Props = {
 	disabled: boolean;
 	isPublished: boolean;
-	chapterId: string;
 	courseId: string;
 };
-const ChapterActions = ({
-	chapterId,
-	courseId,
-	disabled,
-	isPublished,
-}: Props) => {
+const CourseActions = ({ courseId, disabled, isPublished }: Props) => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const router = useRouter();
 
@@ -27,16 +21,12 @@ const ChapterActions = ({
 		try {
 			setIsLoading(true);
 			if (isPublished) {
-				await axios.patch(
-					`/api/courses/${courseId}/chapters/${chapterId}/unpublish`
-				);
-				toast.success("Chapter UnPublished");
+				await axios.patch(`/api/courses/${courseId}/unpublish`);
+				toast.success("Course UnPublished");
 				router.refresh();
 			} else {
-				await axios.patch(
-					`/api/courses/${courseId}/chapters/${chapterId}/publish`
-				);
-				toast.success("Chapter Published");
+				await axios.patch(`/api/courses/${courseId}/publish`);
+				toast.success("Course Published");
 				router.refresh();
 			}
 		} catch (error) {
@@ -48,10 +38,9 @@ const ChapterActions = ({
 	const handleOnDelete = async () => {
 		try {
 			setIsLoading(true);
-			await axios.delete(`/api/courses/${courseId}/chapters/${chapterId}`);
-			toast.success("Chapter Deleted");
-			router.refresh();
-			router.push(`/teacher/courses/${courseId}`);
+			await axios.delete(`/api/courses/${courseId}`);
+			toast.success("Course Deleted");
+			router.push(`/teacher/courses`);
 		} catch (error) {
 			toast.error("Something went wrong!");
 		} finally {
@@ -77,4 +66,4 @@ const ChapterActions = ({
 	);
 };
 
-export default ChapterActions;
+export default CourseActions;
