@@ -4,12 +4,13 @@
 // use npx prisma generate to generate the models inside the db locally
 //use npx prisma db push to push the data and sync it with the db provider
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch", "fullTextIndex"]
 }
 
 model Course {
@@ -30,6 +31,7 @@ model Course {
   purchases   Purchase[]
 
   @@index([categoryId])
+  @@fulltext([title])
 }
 
 model Category {
