@@ -2,9 +2,12 @@ import getChapter from "@/actions/get-chapter";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { auth } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
-import { AiOutlineCheckCircle } from "react-icons/ai";
+import { AiFillFile, AiOutlineCheckCircle } from "react-icons/ai";
 import { FiAlertTriangle } from "react-icons/fi";
 import VideoPlayer from "./_components/video-player";
+import CourseEnrollButton from "./_components/course-enroll-button";
+import { Separator } from "@/components/ui/separator";
+import { Preview } from "@/components/preview";
 
 const ChapterIdPage = async ({
 	params,
@@ -25,7 +28,6 @@ const ChapterIdPage = async ({
 		userProgress,
 		nextChapter,
 	} = await getChapter({ userId, chapterId, courseId });
-
 	if (!chapter || !course) {
 		return redirect("/");
 	}
@@ -57,15 +59,49 @@ const ChapterIdPage = async ({
 				</div>
 			)}
 			<div className="flex flex-col max-w-4xl mx-auto pb-20">
-				<VideoPlayer
-					chapterId={chapterId}
-					title={chapter.title}
-					courseId={courseId}
-					nextChapterId={nextChapter?.id!}
-					playbackId={muxData?.playbackId!}
-					isLocked={isLocked}
-					completeOnEnd={completeOnEnd}
-				/>
+				<div className="p-4">
+					<VideoPlayer
+						chapterId={chapterId}
+						title={chapter.title}
+						courseId={courseId}
+						nextChapterId={nextChapter?.id!}
+						playbackId={muxData?.playbackId!}
+						isLocked={isLocked}
+						completeOnEnd={completeOnEnd}
+					/>
+				</div>
+				<div>
+					<div className="p-4 flex flex-col md:flex-row items-center justify-between">
+						<h2 className="text-2xl font-semibold mb-2">{chapter.title}</h2>
+						{purchase ? (
+							<></>
+						) : (
+							<CourseEnrollButton courseId={courseId} price={course.price!} />
+						)}
+					</div>
+					<Separator />
+					<div>
+						<Preview value={chapter.description!} />
+					</div>
+					{!!attachments.length && (
+						<>
+							<Separator />
+							<div className="p-4">
+								{attachments.map((attachment) => (
+									<a
+										href={attachment.url}
+										key={attachment.id}
+										target="_blank"
+										className=" flex items-center p-3 w-full bg-sky-200 border text-sky-700 rounded-md hover:underline"
+									>
+										<AiFillFile />
+										<p className="line-clamp-1">{attachment.name}</p>
+									</a>
+								))}
+							</div>
+						</>
+					)}
+				</div>
 			</div>
 		</div>
 	);
