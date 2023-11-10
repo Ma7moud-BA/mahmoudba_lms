@@ -34,7 +34,7 @@ const getChapter = async ({ chapterId, courseId, userId }: GetChapterProps) => {
 
 		let muxData = null;
 		let attachments: Attachment[] = [];
-		let nextChapter: Chapter | null = null;
+		let nextChapter: Chapter | null;
 
 		if (purchase) {
 			attachments = await db.attachment.findMany({
@@ -48,10 +48,11 @@ const getChapter = async ({ chapterId, courseId, userId }: GetChapterProps) => {
 				},
 			});
 		}
-		//
+
 		nextChapter = await db.chapter.findFirst({
 			where: {
-				id: chapterId,
+				courseId: courseId,
+				isPublished: true,
 				position: {
 					gt: chapter?.position,
 				},

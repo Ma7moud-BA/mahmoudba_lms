@@ -3,6 +3,7 @@ import Link from "next/link";
 import { IconBadge } from "./icon-badge";
 import { BiBookOpen } from "react-icons/bi";
 import { formatPrice } from "@/lib/format-price";
+import CourseProgress from "@/components/course-progress";
 
 type Props = {
 	id: string;
@@ -42,7 +43,14 @@ const CourseCard = ({
 						</div>
 					</div>
 					{progress !== null ? (
-						<div> TODO:Progress Component</div>
+						<div>
+							{" "}
+							<CourseProgress
+								value={progress}
+								size="sm"
+								variant={progress === 100 ? "success" : "default"}
+							/>
+						</div>
 					) : (
 						<p className="text-md md:text-sm font-medium text-slate-700">
 							{formatPrice(price)}

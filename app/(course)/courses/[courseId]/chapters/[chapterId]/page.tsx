@@ -8,6 +8,7 @@ import VideoPlayer from "./_components/video-player";
 import CourseEnrollButton from "./_components/course-enroll-button";
 import { Separator } from "@/components/ui/separator";
 import { Preview } from "@/components/preview";
+import CourseProgressButton from "./_components/course-progress-button";
 
 const ChapterIdPage = async ({
 	params,
@@ -38,14 +39,12 @@ const ChapterIdPage = async ({
 		<div>
 			{userProgress?.isCompleted && (
 				<div>
-					(
 					<Alert className="bg-yellow-200 rounded-none">
 						<AiOutlineCheckCircle className="h-4 w-4" />
 						<AlertDescription>
 							You already completed this chapter
 						</AlertDescription>
 					</Alert>
-					)
 				</div>
 			)}
 			{isLocked && (
@@ -74,7 +73,12 @@ const ChapterIdPage = async ({
 					<div className="p-4 flex flex-col md:flex-row items-center justify-between">
 						<h2 className="text-2xl font-semibold mb-2">{chapter.title}</h2>
 						{purchase ? (
-							<></>
+							<CourseProgressButton
+								chapterId={chapterId}
+								courseId={courseId}
+								nextChapterId={nextChapter?.id}
+								isCompleted={!!userProgress?.isCompleted}
+							/>
 						) : (
 							<CourseEnrollButton courseId={courseId} price={course.price!} />
 						)}

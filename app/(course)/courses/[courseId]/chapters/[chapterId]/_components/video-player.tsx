@@ -28,6 +28,29 @@ const VideoPlayer = ({
 	title,
 }: Props) => {
 	const [isReady, setIsReady] = useState<boolean>(false);
+	const router = useRouter();
+	const handleOnVideoEnd = async () => {
+		try {
+			if (completeOnEnd) {
+				await axios.put(
+					`/api/courses/${courseId}/chapters/${chapterId}/progress`,
+					{ isCompleted: true }
+				);
+			}
+			toast.success("Progress updated");
+			router.refresh();
+			if (nextChapterId) {
+				router.push(`/courses/${courseId}/chapters/${nextChapterId}`);
+				router.refresh();
+			}
+			if (!nextChapterId) {
+				toast.success("Course Finished");
+				router.refresh();
+			}
+		} catch (error) {
+			toast.error("Something Went Wrong");
+		}
+	};
 	return (
 		<div className="relative aspect-video">
 			{" "}
@@ -49,7 +72,7 @@ const VideoPlayer = ({
 					onCanPlay={() => {
 						setIsReady(true);
 					}}
-					onEnded={() => {}}
+					onEnded={handleOnVideoEnd}
 					autoPlay
 					playbackId={playbackId}
 				/>
