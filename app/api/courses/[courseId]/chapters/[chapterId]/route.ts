@@ -71,6 +71,7 @@ export async function DELETE(
 	try {
 		const { courseId, chapterId } = params;
 		const { userId } = auth();
+
 		//isPublished is going to be handled is a separate route after check all the requirements fields for the chapter to be published
 		if (!userId) {
 			return new NextResponse("Unauthorized", { status: 401 });
